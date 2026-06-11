@@ -8,11 +8,23 @@ import random
 def get_help_text(command=None):
     if command == "ADD":
         return "OK ADD <N1> <N2> to add N1 and N2\n"
+    elif command == "SUB":
+        return "OK SUB <N1> <N2> to subtract N2 from N1\n"
+    elif command == "MUL":
+        return "OK MUL <N1> <N2> to multiply N1 by N2\n"
+    elif command == "DIV":
+        return "OK DIV <N1> <N2> to divide N1 by N2\n"
+    elif command == "RND":
+        return "OK RND <N> to generate a random number between 1 and N, inclusive\n"
+    elif command == "HIST":
+        return "OK HIST to show the last 5 valid operations in the session\n"
+    elif command == "QUIT":
+        return "OK QUIT to end the current session of the arithmetic server\n"
     elif command == "HELP":
         return ("OK HELP [command] to display the syntax and semantics of a specific\n"
                 "command. If no command is specified, it will display all the available\n"
                 "commands and their meanings\n")
-
+    
     return (
         "OK The following commands are available:\n"
         "ADD <N1> <N2> to add N1 and N2\n"
