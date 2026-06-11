@@ -5,6 +5,7 @@
 import socket
 import random
 import threading
+import math
 from datetime import datetime
 
 def get_help_text(command=None):
@@ -15,6 +16,7 @@ def get_help_text(command=None):
             "SUB <N1> <N2> to subtract N2 from N1\n"
             "MUL <N1> <N2> to multiply N1 by N2\n"
             "DIV <N1> <N2> to divide N1 by N2\n"
+            "FACT <N> to calculate the factorial of N (max 1000)\n"
             "RND <N> to generate a random number between 1 and N, inclusive\n"
             "HIST to show the last 5 valid operations in the session\n"
             "HELP [command] to display the syntax and semantics of a specific\n"
@@ -31,6 +33,8 @@ def get_help_text(command=None):
         return "OK MUL <N1> <N2> to multiply N1 by N2\n"
     elif command == "DIV":
         return "OK DIV <N1> <N2> to divide N1 by N2\n"
+    elif command == "FACT":
+        return "OK FACT <N> to calculate the factorial of N (max 1000)\n"
     elif command == "RND":
         return "OK RND <N> to generate a random number between 1 and N, inclusive\n"
     elif command == "HIST":
@@ -82,6 +86,17 @@ def process_command(line, history):
                 return "ERR Division by 0.\n"
             res = n1 // n2
             history.append(f"DIV {n1} {n2} -> {res}")
+            return f"OK {res}\n"
+            
+        elif cmd == "FACT":
+            if len(args) != 1: return f"ERR Invalid number of arguments to {cmd}.\n"
+            n = int(args[0])
+            if n < 0:
+                return "ERR Factorial is not defined for negative numbers.\n"
+            if n > 100:
+                return "ERR Value too large. Maximum allowed is 100 to prevent CPU exhaustion.\n"
+            res = math.factorial(n)
+            history.append(f"FACT {n} -> {res}")
             return f"OK {res}\n"
             
         elif cmd == "RND":
@@ -139,16 +154,16 @@ def handle_client(connection, client_address):
                 
             buffer += data.decode('ascii', errors='ignore')
             
-            # drip defense
+            # --- DEFENSE 1: The Slow Bomb ---
             if '\n' not in buffer and len(buffer) > 256:
                 connection.sendall(b"ERR Command too long.\n")
-                print(f"Client {client_address} exceeded buffer limit. Dropping connection.")
+                print(f"Client {client_address} exceeded buffer limit (slow drip). Dropping connection.")
                 return 
             
             while '\n' in buffer:
                 line, buffer = buffer.split('\n', 1)
                 
-                # fast payload defense
+                # --- DEFENSE 2: The Fast Payload ---
                 if len(line) + 1 > 256:
                     connection.sendall(b"ERR Command too long.\n")
                     print(f"Client {client_address} sent an oversized command line. Dropping connection.")
