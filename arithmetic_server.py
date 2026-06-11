@@ -103,7 +103,7 @@ def process_command(line, history):
 def handle_client(connection, client_address):
     print(f"Connection established with {client_address}")
     
-    connection.sendall(b"OK Welcome to the CSc 113 Arithmetic Server!\n")
+    connection.sendall(b"OK Welcome to the CSC 113 Arithmetic Server!\n")
 
     buffer = ""
     history = []
