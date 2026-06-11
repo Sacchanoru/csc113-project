@@ -4,6 +4,8 @@
 
 import socket
 import random
+import threading
+from datetime import datetime
 
 def get_help_text(command=None):
     if command is None:
@@ -119,7 +121,7 @@ def process_command(line, history):
 def handle_client(connection, client_address):
     print(f"Connection established with {client_address}")
     
-    connection.sendall(b"OK Welcome to the CSC 113 Arithmetic Server!\n")
+    connection.sendall(b"OK Welcome to the CSc 113 Arithmetic Server!\n")
 
     buffer = ""
     history = []
@@ -127,10 +129,20 @@ def handle_client(connection, client_address):
     try:
         while True:
             data = connection.recv(1024)
+
+            timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+            print(f"[{timestamp}] {client_address[0]}:{client_address[1]} recv() -> {len(data)} bytes")
+            print(repr(data))
+            
             if not data:
                 break
                 
             buffer += data.decode('ascii', errors='ignore')
+            
+            if '\n' not in buffer and len(buffer) > 256:
+                connection.sendall(b"ERR Command too long.\n")
+                print(f"Client {client_address} exceeded buffer limit. Dropping connection.")
+                return 
             
             while '\n' in buffer:
                 line, buffer = buffer.split('\n', 1)
@@ -167,7 +179,11 @@ def main():
         while True:
             print('Waiting for a connection...')
             connection, client_address = sock.accept()
-            handle_client(connection, client_address)
+            
+            client_thread = threading.Thread(target=handle_client, args=(connection, client_address))
+            client_thread.daemon = True 
+            client_thread.start()
+
     except KeyboardInterrupt:
         print("\nServer shutting down.")
     finally:
