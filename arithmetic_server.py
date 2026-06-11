@@ -139,6 +139,7 @@ def handle_client(connection, client_address):
                 
             buffer += data.decode('ascii', errors='ignore')
             
+            # drip defense
             if '\n' not in buffer and len(buffer) > 256:
                 connection.sendall(b"ERR Command too long.\n")
                 print(f"Client {client_address} exceeded buffer limit. Dropping connection.")
@@ -146,6 +147,13 @@ def handle_client(connection, client_address):
             
             while '\n' in buffer:
                 line, buffer = buffer.split('\n', 1)
+                
+                # fast payload defense
+                if len(line) + 1 > 256:
+                    connection.sendall(b"ERR Command too long.\n")
+                    print(f"Client {client_address} sent an oversized command line. Dropping connection.")
+                    return
+                
                 line = line.strip()
                 
                 if not line:
