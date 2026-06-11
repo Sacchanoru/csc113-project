@@ -6,6 +6,21 @@ import socket
 import random
 
 def get_help_text(command=None):
+    if command is None:
+        return (
+            "OK The following commands are available:\n"
+            "ADD <N1> <N2> to add N1 and N2\n"
+            "SUB <N1> <N2> to subtract N2 from N1\n"
+            "MUL <N1> <N2> to multiply N1 by N2\n"
+            "DIV <N1> <N2> to divide N1 by N2\n"
+            "RND <N> to generate a random number between 1 and N, inclusive\n"
+            "HIST to show the last 5 valid operations in the session\n"
+            "HELP [command] to display the syntax and semantics of a specific\n"
+            "command. If no command is specified, it will display all the available\n"
+            "commands and their meanings\n"
+            "QUIT to end the current session of the arithmetic server\n"
+        )
+
     if command == "ADD":
         return "OK ADD <N1> <N2> to add N1 and N2\n"
     elif command == "SUB":
@@ -25,19 +40,8 @@ def get_help_text(command=None):
                 "command. If no command is specified, it will display all the available\n"
                 "commands and their meanings\n")
     
-    return (
-        "OK The following commands are available:\n"
-        "ADD <N1> <N2> to add N1 and N2\n"
-        "SUB <N1> <N2> to subtract N2 from N1\n"
-        "MUL <N1> <N2> to multiply N1 by N2\n"
-        "DIV <N1> <N2> to divide N1 by N2\n"
-        "RND <N> to generate a random number between 1 and N, inclusive\n"
-        "HIST to show the last 5 valid operations in the session\n"
-        "HELP [command] to display the syntax and semantics of a specific\n"
-        "command. If no command is specified, it will display all the available\n"
-        "commands and their meanings\n"
-        "QUIT to end the current session of the arithmetic server\n"
-    )
+    else:
+        return f"ERR Unknown operation {command}.\n"
 
 def process_command(line, history):
     parts = line.split()
